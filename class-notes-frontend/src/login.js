@@ -1,6 +1,11 @@
-import {useRef, useState, useEffect} from 'react';
+import {useRef, useState, useEffect, useContext} from 'react';
+import AuthContext from './context/authProvider';
+import axios from './api/axios';
+const LOGIN_URL =  '/auth';
+// Gonna need to verify this path b/c its from backend
 
 const Login = () => {
+    const {setAuth} = useContext(AuthContext);
     const userRef = useRef();
     const errRef = useRef();
 
@@ -19,10 +24,38 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(user, password);
-        setUser('');
-        setPassword('');
-        setSucc(true);
+        
+        try {
+            const response = await axios.post(LOGIN_URL, JSON.stringify({user, password}), 
+            {
+                headers: {'Content-Type': 'application/json'}, withCredentials: true
+            }
+            );
+            console.log(JSON.stringify(response?.data));
+            const accessToken = response?.data?.accessToken;
+            // Backend request.
+            const roles = response?.data?.roles;
+            // This is array from backend, so subject to change.
+            setAuth({user, password, roles, accessToken});
+            setUser('');
+            setPassword('');
+            setSucc(true);
+            
+        } catch (error) {
+            if (!error?.response){
+                setErrMess('Server not Responding.');
+            }
+            else if (error.response?.status === 400){
+                setErrMess('Missing Either Username or Password.');
+            }
+            else if (error.response?.status === 401){
+                setErrMess('Unauthorized.');
+            }
+            else{
+                setErrMess('Login Failed.');
+            }
+            errRef.current.focus();
+        }
     }
 
     return (
