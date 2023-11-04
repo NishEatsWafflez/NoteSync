@@ -11,4 +11,4 @@ const ClassSchema = new Schema({
 
 
 // Exports the PostSchema for use elsewhere.
-module.exports = mongoose.model('Class', ClassSchema);
+module.exports = mongoose.model('classes', ClassSchema);
