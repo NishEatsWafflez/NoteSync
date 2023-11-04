@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 // Defines the Class schema
 const ClassSchema = new Schema({
-  id: {type: Number, required: true},
+  // id: {type: Number, required: true},
   name: { type: String, required: true },
   notes: [{ type: Schema.Types.ObjectId, ref: 'Note'}]
 });
