@@ -1,5 +1,6 @@
 const express = require("express");
- 
+import { Pinecone } from '@pinecone-database/pinecone';
+
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /record.
@@ -8,12 +9,13 @@ const recordRoutes = express.Router();
 // This will help us connect to the database
 const dbo = require("../db/conn");
 const Class = require('../models/class');
+const Note = require('../models/notes');
  
 // This help convert the id from string to ObjectId for the _id.
 const ObjectId = require("mongodb").ObjectId;
  
  
-// This section will help you get a list of all the records.
+// This section will help you get a list of all the classes.
 recordRoutes.get('/class', async (req, res, next) => {
   console.log(Class);
   const classes = await Class.find();
@@ -24,26 +26,24 @@ recordRoutes.get('/class', async (req, res, next) => {
   });
 });
  
-// This section will help you get a single record by id
+// This section will help you get a single class by id
 recordRoutes.get('/class/:id', async (req, res, next) => {
   let classes = [];
-  classes = await Class.findOne({id: req.params.id});
+  classes = await Class.findOne({_id: req.params.id});
   return res.status(200).json({
     statusCode: 200,
     data: { classes },
   });
 });
 
-// This section will help you get a single record by id
-recordRoutes.route("/notes/:id").get(function (req, res) {
-  let db_connect = dbo.getDb("class-notes-database");
-  let myquery = { _id: ObjectId(req.params.id) };
-  db_connect
-    .collection("Note")
-    .findOne(myquery, function (err, result) {
-      if (err) throw err;
-      res.json(result);
-    });
+// This section will help you get a single note by id
+recordRoutes.get('/notes/:id', async (req, res, next) => {
+  let note;
+  note = await Note.findOne({_id: req.params.id});
+  return res.status(200).json({
+    statusCode: 200,
+    data: { note },
+  });
  });
  
 // This section will help you create a new record.
