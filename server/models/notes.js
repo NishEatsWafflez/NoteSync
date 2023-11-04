@@ -12,4 +12,4 @@ const NoteSchema = new Schema({
 
 
 // Exports the PostSchema for use elsewhere.
-module.exports = mongoose.model('Note', NoteSchema);
+module.exports = mongoose.model('note', NoteSchema);

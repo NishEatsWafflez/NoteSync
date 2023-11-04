@@ -7,34 +7,44 @@ const recordRoutes = express.Router();
  
 // This will help us connect to the database
 const dbo = require("../db/conn");
+const Class = require('../models/class');
  
 // This help convert the id from string to ObjectId for the _id.
 const ObjectId = require("mongodb").ObjectId;
  
  
 // This section will help you get a list of all the records.
-recordRoutes.route("/class").get(function (req, res) {
- let db_connect = dbo.getDb("class-notes-database");
- db_connect
-   .collection("Class")
-   .find({})
-   .toArray(function (err, result) {
-     if (err) throw err;
-     res.json(result);
-   });
+recordRoutes.get('/class', async (req, res, next) => {
+  console.log(Class);
+  const classes = await Class.find();
+  return res.status(200).json({
+    statusCode: 200,
+    message: 'Found ' + classes.length,
+    data: { classes },
+  });
 });
  
 // This section will help you get a single record by id
-recordRoutes.route("/class/:id").get(function (req, res) {
- let db_connect = dbo.getDb("class-notes-database");
- let myquery = { _id: ObjectId(req.params.id) };
- db_connect
-   .collection("Class")
-   .findOne(myquery, function (err, result) {
-     if (err) throw err;
-     res.json(result);
-   });
+recordRoutes.get('/class/:id', async (req, res, next) => {
+  let classes = [];
+  classes = await Class.findOne({id: req.params.id});
+  return res.status(200).json({
+    statusCode: 200,
+    data: { classes },
+  });
 });
+
+// This section will help you get a single record by id
+recordRoutes.route("/notes/:id").get(function (req, res) {
+  let db_connect = dbo.getDb("class-notes-database");
+  let myquery = { _id: ObjectId(req.params.id) };
+  db_connect
+    .collection("Note")
+    .findOne(myquery, function (err, result) {
+      if (err) throw err;
+      res.json(result);
+    });
+ });
  
 // This section will help you create a new record.
 recordRoutes.route("/class/new").post(function (req, response) {
