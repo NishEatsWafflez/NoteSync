@@ -1,5 +1,6 @@
 const express = require("express");
-import { Pinecone } from '@pinecone-database/pinecone';
+const {PineconeClient} = require('@pinecone-database/pinecone');
+const { Configuration, OpenAI, OpenAIApi } = require("openai");
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -8,9 +9,9 @@ const recordRoutes = express.Router();
  
 // This will help us connect to the database
 const dbo = require("../db/conn");
-const Class = require('../models/classes');
+const Class = require('../models/class');
 const Note = require('../models/notes');
-const User = require('../models/users');
+const User = require('../models/user');
 
  
 // This help convert the id from string to ObjectId for the _id.
@@ -70,14 +71,25 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
 
 
 // This section will help you create a new note.
-recordRoutes.route("/note/new").post(async function (req, res) {
+recordRoutes.post('/note/new', async (req, res, next) => {
+  const configuration = new Configuration({
+    apiKey: process.env.OPEN_AI_API,
+  });
+  const openai = new OpenAIApi(configuration);
+  const pinecone = new PineconeClient();
+  await pinecone.init({
+    environment: "gcp-starter",
+    apiKey: process.env.PINECONE_KEY,
+  });
+  const index = pinecone.Index("class-notes-data");
+  // recordRoutes.route("/note/new").post(async function (req, res) {
   try {
     let userId = req.body.userId;
     let classId = req.body.classId;
     
     // Find the User and Class using their ID
-    const foundUser = await User.findOne(userId);
-    const foundClass = await Class.findone(classId);
+    const foundUser = await User.findOne({_id: userId});
+    const foundClass = await Class.findOne({_id: classId});
 
     if (!foundUser) {
       return res.status(404).json({ message: 'User not found' });
@@ -88,7 +100,7 @@ recordRoutes.route("/note/new").post(async function (req, res) {
     }
     
     // Create a new Class instance
-    const newNote = newNote({
+    const newNote = new Note({
       title: req.body.title,
       text: req.body.text,
       user: foundUser,
@@ -98,11 +110,31 @@ recordRoutes.route("/note/new").post(async function (req, res) {
     
 
     // Save the new Class instance
-    const savedClass = await newClass.save();
-    
-    let savedClassId = savedClass._id;
+    const savedNote = await newNote.save();
 
-    res.json(savedClass); // Respond with the saved Class object
+    const embedNote = await openai.createEmbedding({
+      model: "text-embedding-ada-002",
+      input: savedNote.title + " - " + savedNote.text
+    }).catch((err) => {
+      console.log(err.data.error);
+    });
+    let savedNoteId = savedNote._id;
+
+    const vectors = embedNote.data.data[0].embedding;
+      const upsertRequest = {
+        vectors: [
+          {
+            id: `${savedNoteId}`,
+            values: vectors
+          }
+        ]
+        // namespace: foundClass._id
+      };
+      const upsertResponse = await index.upsert({ upsertRequest });
+      // res.status(200).json({ message: 'New listing created', id:  })
+
+
+    res.json(savedNote); // Respond with the saved Class object
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
