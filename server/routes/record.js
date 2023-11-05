@@ -27,7 +27,26 @@ recordRoutes.get('/class', async (req, res, next) => {
     data: { classes },
   });
 });
- 
+
+// This section will help you create a new class.
+recordRoutes.route("/class/new").post(async function (req, res) {
+  try {
+
+    // Create a new Class instance
+    const newClass = new Class({
+      name: req.body.name,
+      notes: []
+    });
+
+    // Save the new Class instance
+    const savedClass = await newClass.save();
+
+    res.json(savedClass); // Respond with the saved Class object
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 // This section will help you get a single class by id
 recordRoutes.get('/class/:id', async (req, res, next) => {
   let classes = [];
@@ -48,29 +67,11 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
   });
  });
  
-// This section will help you create a new class.
-recordRoutes.route("/class/new").post(async function (req, res) {
-  try {
 
-    // Create a new Class instance
-    const newClass = new Class({
-      name: req.body.name,
-      notes: []
-    });
-
-    // Save the new Class instance
-    const savedClass = await newClass.save();
-
-    res.json(savedClass); // Respond with the saved Class object
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
 
 // This section will help you create a new note.
 recordRoutes.route("/note/new").post(async function (req, res) {
   try {
-  
     let userId = req.body.userId;
     let classId = req.body.classId;
     
@@ -98,6 +99,8 @@ recordRoutes.route("/note/new").post(async function (req, res) {
 
     // Save the new Class instance
     const savedClass = await newClass.save();
+    
+    let savedClassId = savedClass._id;
 
     res.json(savedClass); // Respond with the saved Class object
   } catch (err) {
