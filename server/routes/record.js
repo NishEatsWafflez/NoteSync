@@ -69,6 +69,64 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
   });
  });
  
+ recordRoutes.get('/generate', async (req, res, next) => {
+  //Need to embed current note, do a find K closest to get 3-5 ids of similar notes, then transcribe those into text and run 
+  //a completion api call to generate the other bullet points
+  const configuration = new Configuration({
+    apiKey: process.env.OPEN_AI_API,
+  });
+  const openai = new OpenAIApi(configuration);
+  const pinecone = new PineconeClient();
+  await pinecone.init({
+    environment: "gcp-starter",
+    apiKey: process.env.PINECONE_KEY,
+  });
+  const index = pinecone.Index("class-notes-data");
+  // recordRoutes.route("/note/new").post(async function (req, res) {
+  try {
+    const embedNote = await openai.createEmbedding({
+      model: "text-embedding-ada-002",
+      input: req.body.title + " - " + req.body.text
+    }).catch((err) => {
+      console.log(err.data.error);
+    });
+    // let savedNoteId = savedNote._id;
+
+    const vectors = embedNote.data.data[0].embedding;
+    console.log(vectors);
+    const queryRequest = {
+      vector: vectors,
+      topK: 5
+    };
+    const queryResponse = await index.query({ queryRequest });
+    let queryIds = queryResponse.matches.map(function (obj) {
+      return obj.id;
+    });
+    let jsonOfIds = [];
+    for ( item of queryIds){
+      let doc = await Note.findOne({_id: item});
+      jsonOfIds.push(doc);
+    }
+    // console.log(jsonOfIds);
+    messages = ""
+    messages += jsonOfIds.map(function (obj) {
+      return obj.text;
+    });
+    // queryIds = queryIds.slice(1);
+    console.log(messages);
+    console.log(req.body.text);
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [{role: "user", content: `Using the following notes: ${messages}, think of 3 points to add to the following note ${req.body.text}. Only refer to info from the other notes and only provide a list without any other preamble.`}],
+      max_tokens: 200,
+    });
+    console.log(response.data.choices[0].message);
+    res.json({message: response.data.choices[0].message.content}); // Respond with the saved Class object
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+
+ });
 
 
 // This section will help you create a new note.
