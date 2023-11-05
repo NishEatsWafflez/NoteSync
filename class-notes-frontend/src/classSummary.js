@@ -78,7 +78,7 @@ const ClassSummary = () => {
         const data = {
             "title": user,
             "text": password,
-            "userId": auth.user, //need to replace w/ user id HEY FERHAWN
+            "userId": auth.user, 
             "classId": id
         };
 
@@ -119,7 +119,7 @@ const ClassSummary = () => {
         const data = {
             "title": currentNote.title,
             "text": currentNote.text,
-            "userId": auth.user, //need to replace w/ user id HEY FERHAWN
+            "userId": auth.user,
             "classId": id
         };
         
@@ -224,56 +224,56 @@ const ClassSummary = () => {
       };
     return (
         <>
+            <div className='w-full h-screen bg-gray-500'>
+                <div className='h-full flex flex-row flex-between w-auto content-center text-2xl bg-gray-500'>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px] bg-zinc-400 rounded-xl mt-[5%]'>
+                        <div onClick={handleItemClick} className='h-[25px] w-full'>Create new note</div>
+                        {notes.map((item, index) => (
+                            <ClassItem key={index} name={item.title} id={item._id} itemDetails={item} onItemClick={handleItemClick} />
+                        ))}
+                    </div>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px] bg-zinc-400 rounded-xl mt-[5%]'>
+                        {currentNote != null ?
+                            currentNote?.user == auth.user ? 
+                                (<div className='h-full overflow-y-auto'>
+                                    Edit
+                                    <form onSubmit={editNote} className='w-2/4 md:w-full flex-col flex h-[90%]'>
+                                        {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
+                                        <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={handleInputChange} name = "title" value = {currentNote.title} required />
 
-            <div className='flex flex-row flex-between w-auto content-center text-2xl mt-[50px]'>
-                <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    <div onClick={handleItemClick} className='h-[25px] w-full'>Create new note</div>
-                    {notes.map((item, index) => (
-                        <ClassItem key={index} name={item.title} id={item._id} itemDetails={item} onItemClick={handleItemClick} />
-                    ))}
-                </div>
-                <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    {currentNote != null ?
-                        currentNote?.user == auth.user ?  /* HEY FERHAWN, change this to currentNote?.user == userId ? */
-                            (<div className='h-full overflow-y-auto'>
-                                Edit
-                                <form onSubmit={editNote} className='w-2/4 md:w-full flex-col flex h-[90%]'>
-                                    {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
-                                    <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={handleInputChange} name = "title" value = {currentNote.title} required />
-
-                                    <textarea onChange={handleInputChange} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={currentNote.text} name = "text" required />
-                                    <button>Save Note</button>
-                                </form>
-                                <button onClick={generatePointsCurrent} className='h-[10%]'>Generate</button>
-                                <div>
-                                    {bulletPoints?.message}
+                                        <textarea onChange={handleInputChange} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={currentNote.text} name = "text" required />
+                                        <button>Save Note</button>
+                                    </form>
+                                    <button onClick={generatePointsCurrent} className='h-[10%]'>Generate</button>
+                                    <div>
+                                        {bulletPoints?.message}
+                                    </div>
                                 </div>
-                            </div>
-                            ) :
-                            (<div className='overflow-y-auto'>
-                                {currentNote.title}
-                                <br />
-                                <div className='text-left'>{currentNote.text}</div>
-                            </div>)
+                                ) :
+                                (<div className='overflow-y-auto'>
+                                    {currentNote.title}
+                                    <br />
+                                    <div className='text-left'>{currentNote.text}</div>
+                                </div>)
 
-                        : (
-                            <div className='h-full overflow-y-auto'>
-                                <form onSubmit={newNote} className='w-2/4 md:w-full flex-col flex h-full'>
-                                    {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
-                                    <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
+                            : (
+                                <div className='h-full overflow-y-auto'>
+                                    <form onSubmit={newNote} className='w-2/4 md:w-full flex-col flex h-full'>
+                                        {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
+                                        <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
 
-                                    <textarea onChange={(e) => setPassword(e.target.value)} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={password} required />
-                                    <button>Save Note</button>
-                                </form>
-                                <button onClick={generatePoints} className='h-[10%]'>Generate</button>
-                                <div>
-                                    {bulletPoints?.message}
-                                </div>
-                            </div>)
-                    }
+                                        <textarea onChange={(e) => setPassword(e.target.value)} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={password} required />
+                                        <button>Save Note</button>
+                                    </form>
+                                    <button onClick={generatePoints} className='h-[10%]'>Generate</button>
+                                    <div>
+                                        {bulletPoints?.message}
+                                    </div>
+                                </div>)
+                        }
+                    </div>
                 </div>
             </div>
-
 
 
         </>

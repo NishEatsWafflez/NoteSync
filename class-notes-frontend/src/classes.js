@@ -39,12 +39,14 @@ const Classes = () => {
         userRef.current.focus();
         try {
             console.log(CLASS_URL);
+            console.log(auth);
             fetch(CLASS_URL, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 }
             }).then((response) => {
+                console.log(response);
                 if (response.ok) {
                     return response.json();
                 }
@@ -101,21 +103,22 @@ const Classes = () => {
     };
     return (
         <>
+            <div className='w-full h-screen bg-gray-500'>
+                <div className='h-full flex flex-row flex-between w-auto content-center text-2xl bg-gray-500'>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px] bg-zinc-400 rounded-xl mt-[5%]'>
+                        {classList.map((item, index) => (
+                            <ClassItem key={index} name={item.name} id={item._id} onItemClick={handleItemClick} />
+                        ))}
+                    </div>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px] bg-zinc-400 rounded-xl mt-[5%]'>
+                        <h1 className='text-4xl mb-[20px]'>Create a new class</h1>
 
-            <div className='flex flex-row flex-between w-auto content-center text-2xl mt-[50px]'>
-                <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    {classList.map((item, index) => (
-                        <ClassItem key={index} name={item.name} id={item._id} onItemClick={handleItemClick} />
-                    ))}
-                </div>
-                <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    <h1 className='text-4xl mb-[20px]'>Create a new class</h1>
-
-                    <form onSubmit={handleNewClass} className='w-2/4 md:w-full flex-col flex h-[300px]'>
-                        <label htmlFor="username" className='mt-auto mb-2'>Class Name:</label>
-                        <input type="text" id="username" className="border-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setClassName(e.target.value)} value={className} required />
-                        <button>Create</button>
-                    </form>
+                        <form onSubmit={handleNewClass} className='w-2/4 md:w-full flex-col flex h-[300px]'>
+                            <label htmlFor="username" className='mt-auto mb-2'>Class Name:</label>
+                            <input type="text" id="username" className="border-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setClassName(e.target.value)} value={className} required />
+                            <button>Create</button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
