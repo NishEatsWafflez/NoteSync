@@ -200,12 +200,12 @@ recordRoutes.post('/note/new', async (req, res, next) => {
 });
 
 // This section will help you update a note by id.
-recordRoutes.route("note/:id").put(function (req, res) {
+recordRoutes.route("/note/:id").put(async function (req, res) {
   const { id } = req.params;
   const { title, text } = req.body;
 
   try {
-    const updatedNote = await Note.findOne(_id: req.params.id);
+    const updatedNote = await Note.findOne({_id: req.params.id});
 
     if (updatedNote) {
       updatedNote.title = req.body.title;
@@ -220,12 +220,12 @@ recordRoutes.route("note/:id").put(function (req, res) {
   }
 });
 
-recordRoutes.route("user/register").post((req, res) => {
+recordRoutes.route("/user/register").post(async function (req, res) {
   try {
     const { username, password } = req.body;
 
     // Check if the username already exists in the database
-    const existingUser = await User.findOne(_id: req.body.username);
+    const existingUser = await User.findOne({username: req.body.username});
 
     if (existingUser) {
       return res.status(400).json({ message: 'Username already exists' });
@@ -250,12 +250,12 @@ recordRoutes.route("user/register").post((req, res) => {
   }
 });
 
-recordRoutes.route("user/login").post((req, res) => {
+recordRoutes.route("/user/login").post(async (req, res) => {
   try {
     const { username, password } = req.body;
 
     // Find the user by username
-    const user = await User.findOne(_id: req.body.username);
+    const user = await User.findOne({username: req.body.username});
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
