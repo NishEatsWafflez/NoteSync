@@ -5,6 +5,8 @@ import axios from './api/axios';
 // import { Button, ButtonProps } from '@mantine/core';
 const CLASS_URL = 'http://localhost:8080/api/routes/class/';
 const GENRATE_URL = 'http://localhost:8080/api/routes/generate';
+const NEW_NOTE = 'http://localhost:8080/api/routes/note/new';
+const EDIT_NOTE = 'http://localhost:8080/api/routes/note/'
 
 // Gonna need to verify this path b/c its from backend
 
@@ -16,6 +18,8 @@ const ClassSummary = () => {
     const ClassItem = (props) => {
         const handleItemClick = () => {
             changeNoteView(props.itemDetails)
+            addPoints(null);
+
             console.log(currentNote);
         };
         return (
@@ -24,13 +28,7 @@ const ClassSummary = () => {
             </div>
         )
     };
-    const { setAuth } = useContext(AuthContext);
-          };
-    return(
-        <div onClick={handleItemClick}>
-            <p className='text-left'>{props.name}</p>
-        </div>
-    )};
+
     const auth = useAuth();
     const userRef = useRef();
     const errRef = useRef();
@@ -68,6 +66,86 @@ const ClassSummary = () => {
             console.error('An error occurred:', error);
         }
     }, [])
+    const newNote = async (e) => {
+        e.preventDefault();
+
+
+        const data = {
+            "title": user,
+            "text": password,
+            "userId": id, //need to replace w/ user id HEY FERHAWN
+            "classId": id
+        };
+
+        try {
+            // console.log(data);
+            // console.log(NEW_NOTE);
+            fetch(NEW_NOTE, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            }).then((response) => {
+                if (response.ok) {
+                    setSucc(true);
+                    // navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                    return response.json();
+                }
+                else {
+                    setErrorReg(true)
+                    return ({ "error": "error" });
+                }
+            }).then(data => {
+                // if (succ) {
+                //     navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                // }
+                console.log(data);
+            })
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    };
+    const editNote = async (e) => {
+        e.preventDefault();
+
+
+        const data = {
+            "title": currentNote.title,
+            "text": currentNote.text,
+            "userId": id, //need to replace w/ user id HEY FERHAWN
+            "classId": id
+        };
+        
+        try {
+            // console.log(data);
+            console.log(EDIT_NOTE+currentNote._id);
+            fetch(EDIT_NOTE+currentNote._id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            }).then((response) => {
+                if (response.ok) {
+                    setSucc(true);
+                    // navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                    return response.json();
+                }
+                else {
+                    setErrorReg(true)
+                    return ({ "response": response });
+                }
+            }).then(data => {
+                // if (succ) {
+                //     navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                // }
+                console.log(data);
+            })
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    };
 
     useEffect(() => {
         setErrMess('');
@@ -102,6 +180,41 @@ const ClassSummary = () => {
         })
 
     };
+    const generatePointsCurrent = async (e) => {
+        e.preventDefault()
+        let data = {
+            "title": currentNote.title,
+            "text": currentNote.text
+        }
+        console.log(data)
+        fetch(GENRATE_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            else {
+                return ({ "error": "error" });
+            }
+        }).then(data => {
+            console.log(data);
+            addPoints(data);
+        })
+
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        // Update the state with the changed form field value
+        changeNoteView({
+          ...currentNote,
+          [name]: value,
+        });
+      };
     return (
         <>
 
@@ -114,26 +227,42 @@ const ClassSummary = () => {
                 </div>
                 <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
                     {currentNote != null ?
-                        (
-                            <div className='overflow-y-auto'>
-                                {currentNote.title}
+                        currentNote?.user == currentNote?.user ?  /* HEY FERHAWN, change this to currentNote?.user == userId ? */
+                            (<div className='h-full overflow-y-auto'>
+                                Edit
+                                <form onSubmit={editNote} className='w-2/4 md:w-full flex-col flex h-[90%]'>
+                                    {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
+                                    <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={handleInputChange} name = "title" value = {currentNote.title} required />
+
+                                    <textarea onChange={handleInputChange} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={currentNote.text} name = "text" required />
+                                    <button>Save Note</button>
+                                </form>
+                                <button onClick={generatePointsCurrent} className='h-[10%]'>Generate</button>
+                                <div>
+                                    {bulletPoints?.message}
+                                </div>
+                            </div>
+                            ) :
+                            (<div className='overflow-y-auto'>
+                                {currentNote.user}
                                 <br />
                                 <div className='text-left'>{currentNote.text}</div>
-                            </div>
-                        ) :
-                        <div className='h-full overflow-y-auto'>
-                            <form className='w-2/4 md:w-full flex-col flex h-full'>
-                                {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
-                                <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
+                            </div>)
 
-                                <textarea onChange={(e) => setPassword(e.target.value)} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={password} required />
-                                <button>Save Note</button>
+                        : (
+                            <div className='h-full overflow-y-auto'>
+                                <form onSubmit={newNote} className='w-2/4 md:w-full flex-col flex h-full'>
+                                    {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
+                                    <input type="text" id="username" className="border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
+
+                                    <textarea onChange={(e) => setPassword(e.target.value)} className="rounded w-7/8 mx-auto border-t-2 align-text-top top-0 h-full mt-[5px] border-black whitespace-break-spaces resize-none" value={password} required />
+                                    <button>Save Note</button>
+                                </form>
                                 <button onClick={generatePoints} className='h-[10%]'>Generate</button>
-                            </form>
-                            <div>
-                                {bulletPoints?.message}
-                            </div>
-                        </div>
+                                <div>
+                                    {bulletPoints?.message}
+                                </div>
+                            </div>)
                     }
                 </div>
             </div>

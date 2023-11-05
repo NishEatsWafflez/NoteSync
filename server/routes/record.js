@@ -275,6 +275,10 @@ recordRoutes.route("/note/:id").put(async function (req, res) {
     
         res.json(savedNote); // Respond with the saved Class object
       } 
+     catch (err) {
+      console.error('Error: ', err);
+      res.status(500).json({ message: 'Server error' });
+      } 
     }else {
         res.status(404).json({ message: 'Note not found' });
       }
