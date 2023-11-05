@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from './context/authProvider';
 import axios from './api/axios';
+// import { Button, ButtonProps } from '@mantine/core';
 const LOGIN_URL = 'http://localhost:8080/api/routes/user/login';
 // Gonna need to verify this path b/c its from backend
 
@@ -39,14 +40,14 @@ const Login = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data)
-            }).then((response)=>{
-                if (response.ok){
+            }).then((response) => {
+                if (response.ok) {
                     return response.json();
                 }
-                else{
-                    return ({"error": "error"});
+                else {
+                    return ({ "error": "error" });
                 }
-            }).then(data=>{
+            }).then(data => {
                 console.log(data);
             })
         } catch (error) {
@@ -56,7 +57,7 @@ const Login = () => {
     return (
         <>
             {succ ? (
-                <div>
+                <div className='bg-black'>
                     <h1>Logged in!</h1>
                     <br />
                     <p>
@@ -65,22 +66,46 @@ const Login = () => {
                 </div>
             ) : (
 
-                <div>
-                    <p ref={errRef} className={errMess ? "errmess" :
-                        "offscreen"} aria-live="assertive">{errMess}</p>
+                <div className='flex flex-row flex-between w-auto content-center text-2xl mt-[50px]'>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
+                        <p ref={errRef} className={errMess ? "errmess" :
+                            "offscreen"} aria-live="assertive">{errMess}</p>
 
-                    <h1>Sign In</h1>
+                        <h1 className='text-4xl mb-[20px]'>Sign In</h1>
 
-                    <form onSubmit={handleSubmit}>
-                        <label htmlFor="username">Username:</label>
-                        <input type="text" id="username" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
+                        <form onSubmit={handleSubmit} className='w-2/4 md:w-full flex-col flex h-[300px]'>
+                            <label htmlFor="username" className='mt-auto mb-2'>Username:</label>
+                            <input type="text" id="username" className= "border-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
 
-                        <label htmlFor="password">Password:</label>
-                        <input type="password" id="password" onChange={(e) => setPassword(e.target.value)} value={password} required />
+                            <label htmlFor="password" className='mt-auto mb-2'>Password:</label>
+                            <input type="password" id="password" onChange={(e) => setPassword(e.target.value)} className= "rounded w-7/8 mx-auto border-2 h-[50px] mb-auto  border-black" value={password} required />
 
-                        <button>Sign In</button>
-                    </form>
+                            <button>Sign In</button>
+                        </form>
+                        <p ref={errRef} className={errMess ? "errmess" :
+                            "offscreen"} aria-live="assertive">{errMess}</p>
+                    </div>
+                    <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
+                        <p ref={errRef} className={errMess ? "errmess" :
+                            "offscreen"} aria-live="assertive">{errMess}</p>
+
+                        <h1 className='text-4xl mb-[20px]'>Register</h1>
+
+                        <form onSubmit={handleSubmit} className='w-2/4 md:w-full flex-col flex h-[300px]'>
+                            <label htmlFor="username" className='mt-auto mb-2'>Username:</label>
+                            <input type="text" id="username" className= "border-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
+
+                            <label htmlFor="password" className='mt-auto mb-2'>Password:</label>
+                            <input type="password" id="password" onChange={(e) => setPassword(e.target.value)} className= "rounded w-7/8 mx-auto border-2 h-[50px] mb-auto  border-black" value={password} required />
+
+                            <button>Sign In</button>
+                        </form>
+                        <p ref={errRef} className={errMess ? "errmess" :
+                            "offscreen"} aria-live="assertive">{errMess}</p>
+                    </div>
                 </div>
+
+
             )}
         </>
     )
