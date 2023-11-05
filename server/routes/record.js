@@ -149,6 +149,7 @@ recordRoutes.post('/note/new', async (req, res, next) => {
     // Find the User and Class using their ID
     const foundUser = await User.findOne({_id: userId});
     const foundClass = await Class.findOne({_id: classId});
+    console.log(req.body);
 
     if (!foundUser) {
       return res.status(404).json({ message: 'User not found' });
@@ -166,11 +167,17 @@ recordRoutes.post('/note/new', async (req, res, next) => {
       class: foundClass
     });
 
-    
 
+    if(!foundClass.notes){
+      foundClass.notes = [];
+    }
+    
     // Save the new Class instance
     const savedNote = await newNote.save();
-
+    console.log(savedNote);
+    foundClass.notes.push(newNote);
+    console.log(foundClass.notes);
+    foundClass.save();
     const embedNote = await openai.createEmbedding({
       model: "text-embedding-ada-002",
       input: savedNote.title + " - " + savedNote.text

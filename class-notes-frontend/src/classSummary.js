@@ -1,21 +1,21 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from './context/authProvider';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from './api/axios';
-import { Navigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-
 // import { Button, ButtonProps } from '@mantine/core';
-const CLASS_URL = 'http://localhost:8080/api/routes/class';
+const CLASS_URL = 'http://localhost:8080/api/routes/class/';
 const REGISTER_URL = 'http://localhost:8080/api/routes/class/new';
 
 // Gonna need to verify this path b/c its from backend
 
-const Classes = () => {
-    const navigate = useNavigate();
-
+const ClassSummary = () => {
+    const navigate = useNavigate
+    const { id } = useParams();
+    const [currentNote, changeNoteView] = useState(null);
     const ClassItem = (props) => {
         const handleItemClick = () => {
-            props.onItemClick(props.id);
+            changeNoteView(props.itemDetails)
+            console.log(currentNote);
           };
     return(
         <div onClick={handleItemClick}>
@@ -27,7 +27,7 @@ const Classes = () => {
     const errRef = useRef();
     const [error, setError] = useState(false);
     const [errorReg, setErrorReg] = useState(false);
-    const [classList, setClasses] = useState(["cheese"]);
+    const [notes, setNotes] = useState(["cheese"]);
 
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
@@ -36,10 +36,10 @@ const Classes = () => {
     const [errMess, setErrMess] = useState('');
     const [succ, setSucc] = useState(false);
     useEffect(() => {
-        userRef.current.focus();
         try {
-            console.log(CLASS_URL);
-            fetch(CLASS_URL, {
+            // classId
+            console.log(CLASS_URL+id);
+            fetch(CLASS_URL+id, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -49,12 +49,11 @@ const Classes = () => {
                     return response.json();
                 }
                 else {
-                    // setError(true)
                     return ({ "error": "error" });
                 }
             }).then(data => {
-                console.log(data.data.classes);
-                setClasses(data.data.classes);
+                console.log(data.data.classes.notes);
+                setNotes(data.data.classes.notes);
             })
         } catch (error) {
             console.error('An error occurred:', error);
@@ -65,8 +64,8 @@ const Classes = () => {
         setErrMess('');
     }, [user, password])
     const handleItemClick = (itemId) => {
-        navigate(`/class/${itemId}`)
-      };
+        changeNoteView(null)
+    };
     const handleNewClass = async (e) => {
         e.preventDefault();
 
@@ -93,7 +92,7 @@ const Classes = () => {
                     return ({ "error": "error" });
                 }
             }).then(data => {
-                console.log(data);
+                console.log(data.classes);
             })
         } catch (error) {
             console.error('An error occurred:', error);
@@ -104,18 +103,28 @@ const Classes = () => {
 
             <div className='flex flex-row flex-between w-auto content-center text-2xl mt-[50px]'>
                 <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    {classList.map((item, index) => (
-                        <ClassItem key={index} name={item.name} id={item._id} onItemClick={handleItemClick} />
+                    <div onClick={handleItemClick} className='h-[25px] w-full'>Create new note</div>
+                {notes.map((item, index) => (
+                        <ClassItem key={index} name={item.title} id={item._id} itemDetails = {item} onItemClick={handleItemClick} />
                     ))}
                 </div>
                 <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
-                    <h1 className='text-4xl mb-[20px]'>Create a new class</h1>
+                    {currentNote != null?
+                    (
+                        <div className='overflow-y-auto'>
+                            {currentNote.title}
+                            <br/>
+                            <div className='text-left'>{currentNote.text}</div>
+                        </div>
+                    ):
+                        <form className='w-2/4 md:w-full flex-col flex h-full'>
+		                    {/* <label htmlFor="Title" className='mt-auto mb-2'>Username:</label> */}
+		                    <input type="text" id="username" className= "border-b-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
 
-                    <form onSubmit={handleNewClass} className='w-2/4 md:w-full flex-col flex h-[300px]'>
-                        <label htmlFor="username" className='mt-auto mb-2'>Class Name:</label>
-                        <input type="text" id="username" className="border-2 border-black w-7/8 mb-auto h-[50px] rounded mx-auto" ref={userRef} autoComplete="off" onChange={(e) => setClassName(e.target.value)} value={className} required />
-                        <button>Create</button>
-                    </form>
+		                    <input type="textarea" onChange={(e) => setPassword(e.target.value)} className= "rounded w-7/8 mx-auto border-t-2 align-text-top h-[75%] border-black" value={password} required />
+
+		                    <button>Sign In</button>
+		                </form>                }
                 </div>
             </div>
 
@@ -125,4 +134,4 @@ const Classes = () => {
     )
 }
 
-export default Classes
+export default ClassSummary
