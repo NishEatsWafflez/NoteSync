@@ -5,8 +5,8 @@ import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 // import { Button, ButtonProps } from '@mantine/core';
-const CLASS_URL = 'http://localhost:8080/api/routes/class';
-const REGISTER_URL = 'http://localhost:8080/api/routes/class/new';
+const CLASS_URL = 'https://class-notes-server.onrender.com/api/routes/class';
+const REGISTER_URL = 'https://class-notes-server.onrender.com/api/routes/class/new';
 
 // Gonna need to verify this path b/c its from backend
 

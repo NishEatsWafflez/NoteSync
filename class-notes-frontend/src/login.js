@@ -3,8 +3,10 @@ import { useAuth } from './context/authProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from './api/axios';
 // import { Button, ButtonProps } from '@mantine/core';
-const LOGIN_URL = 'http://localhost:8080/api/routes/user/login';
-const REGISTER_URL = 'http://localhost:8080/api/routes/user/register';
+// https://class-notes-server.onrender.com/api/routes/user/login
+
+const LOGIN_URL = 'https://class-notes-server.onrender.com/api/routes/user/login';
+const REGISTER_URL = 'https://class-notes-server.onrender.com/api/routes/user/register';
 
 // Gonna need to verify this path b/c its from backend
 

@@ -3,10 +3,11 @@ import { useAuth } from './context/authProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from './api/axios';
 // import { Button, ButtonProps } from '@mantine/core';
-const CLASS_URL = 'http://localhost:8080/api/routes/class/';
-const GENRATE_URL = 'http://localhost:8080/api/routes/generate';
-const NEW_NOTE = 'http://localhost:8080/api/routes/note/new';
-const EDIT_NOTE = 'http://localhost:8080/api/routes/note/'
+
+const CLASS_URL = 'https://class-notes-server.onrender.com/api/routes/class/';
+const GENRATE_URL = 'https://class-notes-server.onrender.com/api/routes/generate';
+const NEW_NOTE = 'https://class-notes-server.onrender.com/api/routes/note/new';
+const EDIT_NOTE = 'https://class-notes-server.onrender.com/api/routes/note/'
 
 // Gonna need to verify this path b/c its from backend
 
