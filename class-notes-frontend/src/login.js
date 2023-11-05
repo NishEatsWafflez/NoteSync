@@ -1,11 +1,11 @@
-import {useRef, useState, useEffect, useContext} from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from './context/authProvider';
 import axios from './api/axios';
-const LOGIN_URL =  '/auth';
+const LOGIN_URL = 'http://localhost:8080/api/routes/user/login';
 // Gonna need to verify this path b/c its from backend
 
 const Login = () => {
-    const {setAuth} = useContext(AuthContext);
+    const { setAuth } = useContext(AuthContext);
     const userRef = useRef();
     const errRef = useRef();
 
@@ -21,43 +21,38 @@ const Login = () => {
     useEffect(() => {
         setErrMess('');
     }, [user, password])
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        try {
-            const response = await axios.post(LOGIN_URL, JSON.stringify({user, password}), 
-            {
-                headers: {'Content-Type': 'application/json'}, withCredentials: true
-            }
-            );
-            console.log(JSON.stringify(response?.data));
-            const accessToken = response?.data?.accessToken;
-            // Backend request.
-            const roles = response?.data?.roles;
-            // This is array from backend, so subject to change.
-            setAuth({user, password, roles, accessToken});
-            setUser('');
-            setPassword('');
-            setSucc(true);
-            
-        } catch (error) {
-            if (!error?.response){
-                setErrMess('Server not Responding.');
-            }
-            else if (error.response?.status === 400){
-                setErrMess('Missing Either Username or Password.');
-            }
-            else if (error.response?.status === 401){
-                setErrMess('Unauthorized.');
-            }
-            else{
-                setErrMess('Login Failed.');
-            }
-            errRef.current.focus();
-        }
-    }
 
+
+        const data = {
+            "username": user,
+            "password": password
+        };
+
+        try {
+            console.log(data);
+            console.log(LOGIN_URL);
+            fetch(LOGIN_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            }).then((response)=>{
+                if (response.ok){
+                    return response.json();
+                }
+                else{
+                    return ({"error": "error"});
+                }
+            }).then(data=>{
+                console.log(data);
+            })
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    };
     return (
         <>
             {succ ? (
@@ -70,22 +65,22 @@ const Login = () => {
                 </div>
             ) : (
 
-        <div>
-            <p ref = {errRef} className={errMess ? "errmess" :
-            "offscreen"} aria-live="assertive">{errMess}</p>
+                <div>
+                    <p ref={errRef} className={errMess ? "errmess" :
+                        "offscreen"} aria-live="assertive">{errMess}</p>
 
-            <h1>Sign In</h1>
+                    <h1>Sign In</h1>
 
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="username">Username:</label>      
-                <input type="text" id ="username" ref = {userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required/>
+                    <form onSubmit={handleSubmit}>
+                        <label htmlFor="username">Username:</label>
+                        <input type="text" id="username" ref={userRef} autoComplete="off" onChange={(e) => setUser(e.target.value)} value={user} required />
 
-                <label htmlFor="password">Password:</label>      
-                <input type="password" id ="password" onChange={(e) => setPassword(e.target.value)} value={password} required/>
+                        <label htmlFor="password">Password:</label>
+                        <input type="password" id="password" onChange={(e) => setPassword(e.target.value)} value={password} required />
 
-                <button>Sign In</button>
-            </form>
-        </div>
+                        <button>Sign In</button>
+                    </form>
+                </div>
             )}
         </>
     )

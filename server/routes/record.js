@@ -253,6 +253,7 @@ recordRoutes.route("/user/register").post(async function (req, res) {
 recordRoutes.route("/user/login").post(async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log(username, password);
 
     // Find the user by username
     const user = await User.findOne({username: req.body.username});
