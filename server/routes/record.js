@@ -268,7 +268,7 @@ recordRoutes.route("/user/register").post(async function (req, res) {
     // Save the new user to the database
     const savedUser = await newUser.save();
 
-    res.status(200).json({ message: 'User created successfully' });
+    res.status(200).json({ message: 'User created successfully', id: newUser._id });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -293,7 +293,7 @@ recordRoutes.route("/user/login").post(async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({ message: 'Login successful', id: user._id });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
