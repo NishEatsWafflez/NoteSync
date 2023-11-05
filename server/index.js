@@ -19,6 +19,16 @@ mongoose.connect(url)
   })
 const app = express();
 app.use(cors({origin: '*'}));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  if ('OPTIONS' == req.method) {
+     res.sendStatus(200);
+   }
+   else {
+     next();
+   }});
 app.use(bodyParser.json());
 app.use('/api/routes', Router);
 const http = require('http');
