@@ -69,7 +69,7 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
   });
  });
  
- recordRoutes.post('/generate', async (req, res, next) => {
+ recordRoutes.post('/generate', async (req, res) => {
   //Need to embed current note, do a find K closest to get 3-5 ids of similar notes, then transcribe those into text and run 
   //a completion api call to generate the other bullet points
   const configuration = new Configuration({
@@ -130,7 +130,7 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
 
 
 // This section will help you create a new note.
-recordRoutes.post('/note/new', async (req, res, next) => {
+recordRoutes.post('/note/new', async (req, res) => {
   const configuration = new Configuration({
     apiKey: process.env.OPEN_AI_API,
   });
