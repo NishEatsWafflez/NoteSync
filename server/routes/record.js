@@ -1,6 +1,7 @@
 const express = require("express");
 const {PineconeClient} = require('@pinecone-database/pinecone');
 const { Configuration, OpenAI, OpenAIApi } = require("openai");
+const bcrypt = require('bcrypt');
 
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -141,7 +142,7 @@ recordRoutes.post('/note/new', async (req, res, next) => {
 });
 
 // This section will help you update a note by id.
-recordRoutes.route("note/:id").put(function (req, response) {
+recordRoutes.route("note/:id").put(function (req, res) {
   const { id } = req.params;
   const { title, text } = req.body;
 
@@ -160,16 +161,59 @@ recordRoutes.route("note/:id").put(function (req, response) {
     res.status(500).json({ message: 'Server error' });
   }
 });
- 
-// This section will help you delete a record
-recordRoutes.route("/:id").delete((req, response) => {
- let db_connect = dbo.getDb();
- let myquery = { _id: ObjectId(req.params.id) };
- db_connect.collection("records").deleteOne(myquery, function (err, obj) {
-   if (err) throw err;
-   console.log("1 document deleted");
-   response.json(obj);
- });
+
+recordRoutes.route("user/register").post((req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Check if the username already exists in the database
+    const existingUser = await User.findOne(_id: req.body.username);
+
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    // Hash the password before saving it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new User({
+      username: req.body.username,
+      password: hashedPassword
+      // Add other user data if required
+    });
+
+    // Save the new user to the database
+    const savedUser = await newUser.save();
+
+    res.status(201).json({ message: 'User created successfully' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
- 
+
+recordRoutes.route("user/login").post((req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Find the user by username
+    const user = await User.findOne(_id: req.body.username);
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ message: 'Login successful' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = recordRoutes;
