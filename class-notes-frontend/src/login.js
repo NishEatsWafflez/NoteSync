@@ -32,7 +32,6 @@ const Login = () => {
     }, [user, password])
     const handleSubmit = async (e) => {
         e.preventDefault();
-        auth.login(user)
 
 
         const data = {
@@ -51,17 +50,19 @@ const Login = () => {
                 body: JSON.stringify(data)
             }).then((response) => {
                 if (response.ok) {
-                    setSucc(true);
-                    navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                    // auth.login(response.json().id);
+                    // navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
 
                     return response.json();
                 }
                 else {
                     setError(true)
-                    return ({ "error": "error" });
+                    return ({ "error": "error", id: null });
                 }
             }).then(data => {
-                if (succ) {
+                auth.login(data.id)
+                if (auth.user) {
+                    console.log(auth.user);
                     navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
                 }
                     console.log(data);

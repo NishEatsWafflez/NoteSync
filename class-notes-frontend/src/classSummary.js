@@ -19,8 +19,9 @@ const ClassSummary = () => {
         const handleItemClick = () => {
             changeNoteView(props.itemDetails)
             addPoints(null);
+            // console.log(currentNote.user);
+            // console.log(auth.user);
 
-            console.log(currentNote);
         };
         return (
             <div onClick={handleItemClick}>
@@ -35,6 +36,7 @@ const ClassSummary = () => {
     const [error, setError] = useState(false);
     const [errorReg, setErrorReg] = useState(false);
     const [notes, setNotes] = useState(["cheese"]);
+    const [newer, newWrite] = useState(false);
 
     const [user, setUser] = useState('');
     const [password, setPassword] = useState(null);
@@ -43,6 +45,8 @@ const ClassSummary = () => {
     const [errMess, setErrMess] = useState('');
     const [succ, setSucc] = useState(false);
     useEffect(() => {
+        // console.log(auth.user);
+
         try {
             // classId
             console.log(CLASS_URL + id);
@@ -60,12 +64,13 @@ const ClassSummary = () => {
                 }
             }).then(data => {
                 console.log(data.data.classes.notes);
+                newWrite(false);
                 setNotes(data.data.classes.notes);
             })
         } catch (error) {
             console.error('An error occurred:', error);
         }
-    }, [])
+    }, [newer])
     const newNote = async (e) => {
         e.preventDefault();
 
@@ -73,7 +78,7 @@ const ClassSummary = () => {
         const data = {
             "title": user,
             "text": password,
-            "userId": id, //need to replace w/ user id HEY FERHAWN
+            "userId": auth.user, //need to replace w/ user id HEY FERHAWN
             "classId": id
         };
 
@@ -89,6 +94,7 @@ const ClassSummary = () => {
             }).then((response) => {
                 if (response.ok) {
                     setSucc(true);
+                    newWrite(true)
                     // navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
                     return response.json();
                 }
@@ -113,7 +119,7 @@ const ClassSummary = () => {
         const data = {
             "title": currentNote.title,
             "text": currentNote.text,
-            "userId": id, //need to replace w/ user id HEY FERHAWN
+            "userId": auth.user, //need to replace w/ user id HEY FERHAWN
             "classId": id
         };
         
@@ -128,6 +134,7 @@ const ClassSummary = () => {
                 body: JSON.stringify(data)
             }).then((response) => {
                 if (response.ok) {
+                    newWrite(true);
                     setSucc(true);
                     // navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
                     return response.json();
@@ -227,7 +234,7 @@ const ClassSummary = () => {
                 </div>
                 <div className='w-[400px] flex flex-col content-center mx-auto border-solid border-2 h-[500px] p-[20px]'>
                     {currentNote != null ?
-                        currentNote?.user == currentNote?.user ?  /* HEY FERHAWN, change this to currentNote?.user == userId ? */
+                        currentNote?.user == auth.user ?  /* HEY FERHAWN, change this to currentNote?.user == userId ? */
                             (<div className='h-full overflow-y-auto'>
                                 Edit
                                 <form onSubmit={editNote} className='w-2/4 md:w-full flex-col flex h-[90%]'>
@@ -244,7 +251,7 @@ const ClassSummary = () => {
                             </div>
                             ) :
                             (<div className='overflow-y-auto'>
-                                {currentNote.user}
+                                {currentNote.title}
                                 <br />
                                 <div className='text-left'>{currentNote.text}</div>
                             </div>)
