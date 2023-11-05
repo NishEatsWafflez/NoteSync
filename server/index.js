@@ -19,12 +19,14 @@ mongoose.connect(url)
   })
 const app = express();
 const corsOptions = {
-  origin: "https://share-note.onrender.com", // frontend URI (ReactJS)
+  origin: "*", // frontend URI (ReactJS)
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.options('/api/routes', cors(corsOptions));
+
+app.options('/api/routes/generate', cors(corsOptions));
 app.use('/api/routes', Router);
 const http = require('http');
 const server = http.createServer(app);

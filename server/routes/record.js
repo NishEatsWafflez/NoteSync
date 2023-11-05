@@ -70,10 +70,10 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
  });
  
  recordRoutes.post('/generate', async (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next()
+  // res.setHeader('Access-Control-Allow-Origin', '*');
+  // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  // res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  // next()
   //Need to embed current note, do a find K closest to get 3-5 ids of similar notes, then transcribe those into text and run 
   //a completion api call to generate the other bullet points
   const configuration = new Configuration({
