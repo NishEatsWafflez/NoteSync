@@ -220,6 +220,23 @@ recordRoutes.route("/note/:id").put(async function (req, res) {
   }
 });
 
+recordRoutes.route("/note/delete/:id").delete(async function (req, res) {
+  try {
+    const noteId = req.params.id;
+
+    // Find the note by ID and remove it
+    const deletedNote = await Note.findByIdAndRemove(noteId);
+
+    if (!deletedNote) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
+
+    res.json({ message: 'Note deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 recordRoutes.route("/user/register").post(async function (req, res) {
   try {
     const { username, password } = req.body;
