@@ -24,6 +24,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+app.options('/api/routes', cors(corsOptions));
 app.use('/api/routes', Router);
 const http = require('http');
 const server = http.createServer(app);

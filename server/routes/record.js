@@ -121,7 +121,7 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
       max_tokens: 200,
     });
     console.log(response.data.choices[0].message);
-    res.json({message: response.data.choices[0].message.content}); // Respond with the saved Class object
+    res.status(200).json({message: response.data.choices[0].message.content}); // Respond with the saved Class object
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
