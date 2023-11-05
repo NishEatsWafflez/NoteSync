@@ -140,24 +140,25 @@ recordRoutes.post('/note/new', async (req, res, next) => {
   }
 });
 
-// This section will help you update a record by id.
-recordRoutes.route("/update/:id").post(function (req, response) {
- let db_connect = dbo.getDb();
- let myquery = { _id: ObjectId(req.params.id) };
- let newvalues = {
-   $set: {
-     name: req.body.name,
-     position: req.body.position,
-     level: req.body.level,
-   },
- };
- db_connect
-   .collection("records")
-   .updateOne(myquery, newvalues, function (err, res) {
-     if (err) throw err;
-     console.log("1 document updated");
-     response.json(res);
-   });
+// This section will help you update a note by id.
+recordRoutes.route("note/:id").put(function (req, response) {
+  const { id } = req.params;
+  const { title, text } = req.body;
+
+  try {
+    const updatedNote = await Note.findOne(_id: req.params.id);
+
+    if (updatedNote) {
+      updatedNote.title = req.body.title;
+      updatedNote.text = req.body.text;
+      res.json({ message: 'Note updated successfully', updatedNote });
+    } else {
+      res.status(404).json({ message: 'Note not found' });
+    }
+  } catch (err) {
+    console.error('Error: ', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
  
 // This section will help you delete a record
