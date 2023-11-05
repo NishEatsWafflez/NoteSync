@@ -4,10 +4,9 @@ const Schema = mongoose.Schema;
 
 // Defines the User schema
 const UserSchema = new Schema({
-  id: {type: Number, required: true},
+  // id: {type: Number, required: true},
   username: { type: String, required: true },
-  password: { type: String, required: true },
-  class: [{ type: Schema.Types.ObjectId, ref: 'Class'}]
+  password: { type: String, required: true }
 });
 
 
