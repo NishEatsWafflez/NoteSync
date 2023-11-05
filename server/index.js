@@ -19,7 +19,7 @@ mongoose.connect(url)
   })
 const app = express();
 const corsOptions = {
-  origin: "https://share-note.onrender.com/" // frontend URI (ReactJS)
+  origin: "https://share-note.onrender.com" // frontend URI (ReactJS)
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
