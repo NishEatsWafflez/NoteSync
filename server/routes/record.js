@@ -10,9 +10,9 @@ const recordRoutes = express.Router();
  
 // This will help us connect to the database
 const dbo = require("../db/conn");
+const User = require('../models/user'); 
 const Class = require('../models/class');
 const Note = require('../models/notes');
-const User = require('../models/user');
 
  
 // This help convert the id from string to ObjectId for the _id.
@@ -69,7 +69,7 @@ recordRoutes.get('/notes/:id', async (req, res, next) => {
   });
  });
  
- recordRoutes.get('/generate', async (req, res, next) => {
+ recordRoutes.post('/generate', async (req, res, next) => {
   //Need to embed current note, do a find K closest to get 3-5 ids of similar notes, then transcribe those into text and run 
   //a completion api call to generate the other bullet points
   const configuration = new Configuration({
@@ -208,6 +208,20 @@ recordRoutes.post('/note/new', async (req, res, next) => {
 
 // This section will help you update a note by id.
 recordRoutes.route("/note/:id").put(async function (req, res) {
+  const configuration = new Configuration({
+    apiKey: process.env.OPEN_AI_API,
+  });
+  const openai = new OpenAIApi(configuration);
+  const pinecone = new PineconeClient();
+  await pinecone.init({
+    environment: "gcp-starter",
+    apiKey: process.env.PINECONE_KEY,
+  });
+  const index = pinecone.Index("class-notes-data");
+  // recordRoutes.route("/note/new").post(async function (req, res) {
+  
+
+
   const { id } = req.params;
   const { title, text } = req.body;
 
@@ -215,16 +229,60 @@ recordRoutes.route("/note/:id").put(async function (req, res) {
     const updatedNote = await Note.findOne({_id: req.params.id});
 
     if (updatedNote) {
-      updatedNote.title = req.body.title;
-      updatedNote.text = req.body.text;
-      res.json({ message: 'Note updated successfully', updatedNote });
-    } else {
-      res.status(404).json({ message: 'Note not found' });
-    }
-  } catch (err) {
-    console.error('Error: ', err);
-    res.status(500).json({ message: 'Server error' });
-  }
+      try {
+        const foundClass = await Class.findOne({_id: classId});
+        console.log(req.body);
+        
+        if (!foundClass) {
+          return res.status(404).json({ message: 'Class not found' });
+        }
+        
+        let classId = req.body.classId;
+        updatedNote.title = req.body.title;
+        updatedNote.text = req.body.text;
+        updatedNote.save();
+        res.json({ message: 'Note updated successfully', updatedNote });
+
+        const noteIndex = foundClass.notes.findIndex((note) => note._id.toString() === noteId);
+          if (noteIndex !== -1) {
+            foundClass.notes[noteIndex] = updatedNote;
+          }
+
+          // Save the class object to persist the changes
+          foundClass.save((err, updatedClass));
+
+        const embedNote = await openai.createEmbedding({
+          model: "text-embedding-ada-002",
+          input: updatedNote.title + " - " + updatedNote.text
+        }).catch((err) => {
+          console.log(err.data.error);
+        });
+        let savedNoteId = updatedNote._id;
+    
+        const vectors = embedNote.data.data[0].embedding;
+          const upsertRequest = {
+            vectors: [
+              {
+                id: `${savedNoteId}`,
+                values: vectors
+              }
+            ]
+            // namespace: foundClass._id
+          };
+          const upsertResponse = await index.upsert({ upsertRequest });
+          // res.status(200).json({ message: 'New listing created', id:  })
+    
+    
+        res.json(savedNote); // Respond with the saved Class object
+      } 
+    }else {
+        res.status(404).json({ message: 'Note not found' });
+      }
+    } catch (err) {
+      console.error('Error: ', err);
+      res.status(500).json({ message: 'Server error' });
+    }; 
+      
 });
 
 recordRoutes.route("/note/delete/:id").delete(async function (req, res) {

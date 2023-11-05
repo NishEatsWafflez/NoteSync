@@ -7,8 +7,8 @@ const NoteSchema = new Schema({
   //id: {type: Number, required: true},
   title: { type: String, required: true },
   text: { type: String, required: true },
-  user: { type: Schema.Types.ObjectId, ref: 'User'},
-  class: { type: Schema.Types.ObjectId, ref: 'Class'}
+  user: { type: Schema.Types.ObjectId, ref: 'user'},
+  class: { type: Schema.Types.ObjectId, ref: 'class'}
 });
 
 
