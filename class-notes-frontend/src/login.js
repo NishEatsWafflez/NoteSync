@@ -32,6 +32,7 @@ const Login = () => {
     }, [user, password])
     const handleSubmit = async (e) => {
         e.preventDefault();
+        auth.login(user)
 
 
         const data = {
