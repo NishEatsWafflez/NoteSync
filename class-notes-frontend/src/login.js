@@ -51,6 +51,8 @@ const Login = () => {
             }).then((response) => {
                 if (response.ok) {
                     setSucc(true);
+                    navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+
                     return response.json();
                 }
                 else {
@@ -87,7 +89,8 @@ const Login = () => {
                 body: JSON.stringify(data)
             }).then((response) => {
                 if (response.ok) {
-                    setSucc(true);
+                    // setSucc(true);
+                    navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
                     return response.json();
                 }
                 else {
@@ -95,9 +98,9 @@ const Login = () => {
                     return ({ "error": "error" });
                 }
             }).then(data => {
-                if (succ) {
-                    navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
-                }
+                // if (succ) {
+                //     navigate('/classes'); // Replace '/new-page' with the URL of the page you want to navigate to.            	}
+                // }
                 console.log(data);
             })
         } catch (error) {
