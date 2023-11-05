@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from './context/authProvider';
+import { useAuth } from './context/authProvider';
 import axios from './api/axios';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +22,7 @@ const Classes = () => {
             <p className='text-left'>{props.name}</p>
         </div>
     )};
-    const { setAuth } = useContext(AuthContext);
+    const auth = useAuth();
     const userRef = useRef();
     const errRef = useRef();
     const [error, setError] = useState(false);

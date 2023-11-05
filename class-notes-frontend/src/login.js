@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from './context/authProvider';
+import { useAuth } from './context/authProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from './api/axios';
 // import { Button, ButtonProps } from '@mantine/core';
@@ -10,7 +10,7 @@ const REGISTER_URL = 'http://localhost:8080/api/routes/user/register';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { setAuth } = useContext(AuthContext);
+    const auth = useAuth();
     const userRef = useRef();
     const errRef = useRef();
     const [error, setError] = useState(false);

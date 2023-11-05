@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from './context/authProvider';
+import { useAuth } from './context/authProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from './api/axios';
 // import { Button, ButtonProps } from '@mantine/core';
@@ -22,7 +22,7 @@ const ClassSummary = () => {
             <p className='text-left'>{props.name}</p>
         </div>
     )};
-    const { setAuth } = useContext(AuthContext);
+    const auth = useAuth();
     const userRef = useRef();
     const errRef = useRef();
     const [error, setError] = useState(false);
