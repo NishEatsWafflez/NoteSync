@@ -18,17 +18,10 @@ mongoose.connect(url)
       console.error(`Error connecting to the database. \n${err}`);
   })
 const app = express();
-app.use(cors({origin: '*'}));
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  if ('OPTIONS' == req.method) {
-     res.sendStatus(200);
-   }
-   else {
-     next();
-   }});
+const corsOptions = {
+  origin: "http://localhost:3000" // frontend URI (ReactJS)
+}
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api/routes', Router);
 const http = require('http');
